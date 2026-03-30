@@ -32,11 +32,8 @@ return;
 try {
 
 setLoading(true)
-const res = await axios.post(
-  "https://your-backend.onrender.com/api/auth/login",
-  form
-);
 
+const res = await API.post("/auth/login", form);
 
 /* ✅ STORE DATA */
 
