@@ -1,90 +1,98 @@
-import { useState } from "react"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
+import { useState } from "react";
+import API from "../../api/axios"; // ✅ use API instance
+import { useNavigate } from "react-router-dom";
 
 export default function StudentComplaint(){
 
-const navigate = useNavigate()
+  const navigate = useNavigate();
 
-const [form,setForm] = useState({
-title:"",
-message:""
-})
+  const [form,setForm] = useState({
+    title:"",
+    message:""
+  });
 
-const studentId = localStorage.getItem("studentId")
+  const studentId = localStorage.getItem("studentId");
 
-const handleChange = (e)=>{
-setForm({...form,[e.target.name]:e.target.value})
-}
+  const handleChange = (e)=>{
+    setForm({
+      ...form,
+      [e.target.name]:e.target.value
+    });
+  };
 
-const handleSubmit = async(e)=>{
-e.preventDefault()
+  const handleSubmit = async(e)=>{
+    e.preventDefault();
 
-try{
+    if(!studentId){
+      alert("Session expired. Please login again ❌");
+      return;
+    }
 
-await axios.post("http://localhost:5000/api/complaints",{
-...form,
-student:studentId
-})
+    try{
 
-alert("Complaint submitted successfully")
+      await API.post("/complaints",{
+        ...form,
+        student:studentId
+      }); // ✅ FIXED
 
-navigate("/student/dashboard")
+      alert("Complaint submitted successfully ✅");
 
-}catch(err){
+      navigate("/student/dashboard");
 
-console.log(err)
+    }catch(err){
 
-alert("Error submitting complaint")
+      console.log("SUBMIT ERROR:", err);
 
-}
+      alert("Error submitting complaint ❌");
 
-}
+    }
 
-return(
+  };
 
-<div className="min-h-screen flex justify-center items-center bg-gray-100">
+  return(
 
-<form
-onSubmit={handleSubmit}
-className="bg-white p-8 rounded shadow w-96"
->
+    <div className="min-h-screen flex justify-center items-center bg-gray-100">
 
-<h1 className="text-2xl font-bold mb-6">
-Submit Complaint
-</h1>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded shadow w-96"
+      >
 
-<input
-type="text"
-name="title"
-placeholder="Complaint Title"
-onChange={handleChange}
-className="w-full border p-2 mb-4 rounded"
-required
-/>
+        <h1 className="text-2xl font-bold mb-6">
+          Submit Complaint
+        </h1>
 
-<textarea
-name="message"
-placeholder="Write your complaint..."
-onChange={handleChange}
-className="w-full border p-2 mb-4 rounded"
-rows="4"
-required
-/>
+        <input
+          type="text"
+          name="title"
+          placeholder="Complaint Title"
+          value={form.title}
+          onChange={handleChange}
+          className="w-full border p-2 mb-4 rounded"
+          required
+        />
 
-<button
-type="submit"
-className="bg-red-600 text-white px-4 py-2 rounded w-full"
->
+        <textarea
+          name="message"
+          placeholder="Write your complaint..."
+          value={form.message}
+          onChange={handleChange}
+          className="w-full border p-2 mb-4 rounded"
+          rows="4"
+          required
+        />
 
-Submit Complaint
+        <button
+          type="submit"
+          className="bg-red-600 text-white px-4 py-2 rounded w-full hover:bg-red-700 transition"
+        >
+          Submit Complaint
+        </button>
 
-</button>
+      </form>
 
-</form>
+    </div>
 
-</div>
-
-)
+  );
 
 }

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../api/axios";
 
 export default function Companies() {
+
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(null);
 
@@ -24,15 +25,15 @@ export default function Companies() {
 
   const fetchCompanies = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/companies");
+      const res = await API.get("/companies");   // ✅ FIXED
       setCompanies(res.data);
     } catch (err) {
-      console.log(err);
+      console.log("FETCH ERROR:", err);
     }
   };
 
   // =========================
-  // FORM INPUT HANDLERS
+  // INPUT HANDLERS
   // =========================
   const handleChange = (e) => {
     setForm({
@@ -55,13 +56,16 @@ export default function Companies() {
     e.preventDefault();
 
     const studentId = localStorage.getItem("studentId");
+
     if (!studentId) {
       alert("Student ID not found. Please login again.");
       return;
     }
 
     try {
+
       const data = new FormData();
+
       data.append("studentId", studentId);
       data.append("companyId", selectedCompany);
       data.append("fullName", form.fullName);
@@ -72,14 +76,16 @@ export default function Companies() {
       data.append("skills", form.skills);
       data.append("resume", form.resume);
 
-      await axios.post(
-        "http://localhost:5000/api/companies/apply",
-        data,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      await API.post("/companies/apply", data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }); // ✅ FIXED
 
       alert("Application Submitted 🎉");
+
       setSelectedCompany(null);
+
       setForm({
         fullName: "",
         email: "",
@@ -89,8 +95,9 @@ export default function Companies() {
         skills: "",
         resume: null
       });
+
     } catch (err) {
-      console.log(err);
+      console.log("SUBMIT ERROR:", err);
       alert("Application Failed ❌");
     }
   };
@@ -100,15 +107,35 @@ export default function Companies() {
   // =========================
   return (
     <div className="p-10">
-      <h1 className="text-3xl font-bold mb-8">Available Companies</h1>
 
-      {/* Company List */}
+      <h1 className="text-3xl font-bold mb-8">
+        Available Companies
+      </h1>
+
+      {/* ========================= */}
+      {/* COMPANY LIST */}
+      {/* ========================= */}
+
       <div className="grid grid-cols-3 gap-6 mb-10">
+
         {companies.map((company) => (
-          <div key={company._id} className="p-6 bg-white shadow rounded-xl">
-            <h2 className="text-xl font-bold">{company.companyName}</h2>
-            <p className="mt-2">Role: {company.role}</p>
-            <p>Dept: {company.eligibleDepartment}</p>
+
+          <div
+            key={company._id}
+            className="p-6 bg-white shadow rounded-xl"
+          >
+
+            <h2 className="text-xl font-bold">
+              {company.companyName}
+            </h2>
+
+            <p className="mt-2">
+              Role: {company.role}
+            </p>
+
+            <p>
+              Dept: {company.eligibleDepartment}
+            </p>
 
             <button
               onClick={() => setSelectedCompany(company._id)}
@@ -116,17 +143,27 @@ export default function Companies() {
             >
               Apply
             </button>
+
           </div>
+
         ))}
+
       </div>
 
-      {/* Application Form */}
+      {/* ========================= */}
+      {/* APPLICATION FORM */}
+      {/* ========================= */}
+
       {selectedCompany && (
+
         <form
           onSubmit={submitApplication}
           className="bg-white p-6 rounded shadow w-96"
         >
-          <h2 className="text-xl mb-4">Application Form</h2>
+
+          <h2 className="text-xl mb-4">
+            Application Form
+          </h2>
 
           <input
             type="text"
@@ -137,6 +174,7 @@ export default function Companies() {
             onChange={handleChange}
             className="border p-2 w-full mb-3"
           />
+
           <input
             type="email"
             name="email"
@@ -146,6 +184,7 @@ export default function Companies() {
             onChange={handleChange}
             className="border p-2 w-full mb-3"
           />
+
           <input
             type="text"
             name="phone"
@@ -155,6 +194,7 @@ export default function Companies() {
             onChange={handleChange}
             className="border p-2 w-full mb-3"
           />
+
           <input
             type="text"
             name="department"
@@ -164,6 +204,7 @@ export default function Companies() {
             onChange={handleChange}
             className="border p-2 w-full mb-3"
           />
+
           <input
             type="text"
             name="cgpa"
@@ -173,6 +214,7 @@ export default function Companies() {
             onChange={handleChange}
             className="border p-2 w-full mb-3"
           />
+
           <input
             type="text"
             name="skills"
@@ -182,6 +224,7 @@ export default function Companies() {
             onChange={handleChange}
             className="border p-2 w-full mb-3"
           />
+
           <input
             type="file"
             required
@@ -192,8 +235,11 @@ export default function Companies() {
           <button className="bg-green-600 text-white px-4 py-2 rounded w-full hover:bg-green-700">
             Submit Application
           </button>
+
         </form>
+
       )}
+
     </div>
   );
 }

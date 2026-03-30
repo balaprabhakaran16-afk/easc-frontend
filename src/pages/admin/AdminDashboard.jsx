@@ -7,11 +7,18 @@ export default function AdminDashboard(){
 
 const [stats,setStats] = useState({})
 
+/* ✅ FIX ONLY HERE */
+const baseURL =
+window.location.hostname === "localhost"
+? "http://localhost:5000"
+: "https://eascbackend.onrender.com"
+
 useEffect(()=>{
 
 axios
-.get("http://localhost:5000/api/application/admin/stats")
+.get(`${baseURL}/api/application/admin/stats`)
 .then(res=>setStats(res.data))
+.catch(err=>console.error(err))
 
 },[])
 

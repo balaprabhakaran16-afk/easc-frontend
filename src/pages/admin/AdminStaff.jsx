@@ -7,12 +7,18 @@ export default function AdminStaff(){
 const [staff,setStaff] = useState([])
 const [search,setSearch] = useState("")
 
+/* ✅ FIX ONLY HERE */
+const baseURL =
+window.location.hostname === "localhost"
+? "http://localhost:5000"
+: "https://eascbackend.onrender.com"
+
 useEffect(()=>{
 fetchStaff()
 },[])
 
 const fetchStaff = ()=>{
-axios.get("http://localhost:5000/api/admin/staff")
+axios.get(`${baseURL}/api/admin/staff`)
 .then(res=>setStaff(res.data))
 .catch(err=>console.log(err))
 }
@@ -64,8 +70,8 @@ key={dept}
 whileHover={{scale:1.05}}
 className={`p-6 rounded-xl shadow-lg text-white ${
   index === 0
-    ? "bg-[var(--accent)]"       // only first department card uses accent (pink)
-    : "bg-[var(--secondary)]"    // rest use secondary (yellow/green)
+    ? "bg-[var(--accent)]"
+    : "bg-[var(--secondary)]"
 }`}
 >
 <h2>{dept}</h2>

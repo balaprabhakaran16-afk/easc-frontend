@@ -1,103 +1,98 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../../api/axios"; // ✅ use axios instance
 
 export default function MyApplications(){
 
-const [applications,setApplications] = useState([])
+  const [applications,setApplications] = useState([]);
 
-const studentId = localStorage.getItem("studentId")
+  const studentId = localStorage.getItem("studentId");
 
-useEffect(()=>{
-fetchApplications()
-},[])
+  useEffect(()=>{
+    if(studentId){
+      fetchApplications();
+    }
+  },[studentId]);
 
-const fetchApplications = async()=>{
+  const fetchApplications = async()=>{
 
-try{
+    try{
 
-const res = await axios.get(
-`http://localhost:5000/api/companies/student/${studentId}`
-)
+      const res = await API.get(
+        `/companies/student/${studentId}` // ✅ FIXED
+      );
 
-setApplications(res.data)
+      setApplications(res.data);
 
-}catch(err){
+    }catch(err){
 
-console.log(err)
+      console.log("FETCH ERROR:", err);
 
-}
+    }
 
-}
+  };
 
-return(
+  return(
 
-<div className="p-10">
+    <div className="p-10">
 
-<h1 className="text-3xl font-bold mb-8">
+      <h1 className="text-3xl font-bold mb-8">
+        My Applications
+      </h1>
 
-My Applications
+      {!studentId && (
+        <p className="text-red-500">
+          Please login again ❌
+        </p>
+      )}
 
-</h1>
+      {applications.length === 0 && studentId && (
+        <p>No applications yet</p>
+      )}
 
-{applications.length === 0 && (
+      <div className="grid grid-cols-3 gap-6">
 
-<p>No applications yet</p>
+        {applications.map((app)=>(
 
-)}
+          <div
+            key={app._id}
+            className="p-6 bg-white shadow rounded-xl"
+          >
 
-<div className="grid grid-cols-3 gap-6">
+            <h2 className="text-xl font-bold">
+              {app.company?.companyName}
+            </h2>
 
-{applications.map((app)=>(
+            <p className="mt-2">
+              Role: {app.company?.role}
+            </p>
 
-<div
-key={app._id}
-className="p-6 bg-white shadow rounded-xl"
->
+            <p>
+              Dept: {app.company?.eligibleDepartment}
+            </p>
 
-<h2 className="text-xl font-bold">
+            <p className="mt-4 font-semibold">
+              Status:
 
-{app.company?.companyName}
+              <span
+                className={`ml-2
+                ${app.status==="selected"?"text-green-600":""}
+                ${app.status==="rejected"?"text-red-600":""}
+                ${app.status==="applied"?"text-blue-600":""}
+                `}
+              >
+                {app.status}
+              </span>
 
-</h2>
+            </p>
 
-<p className="mt-2">
+          </div>
 
-Role: {app.company?.role}
+        ))}
 
-</p>
+      </div>
 
-<p>
+    </div>
 
-Dept: {app.company?.eligibleDepartment}
-
-</p>
-
-<p className="mt-4 font-semibold">
-
-Status:
-
-<span
-className={`ml-2
-${app.status==="selected"?"text-green-600":""}
-${app.status==="rejected"?"text-red-600":""}
-${app.status==="applied"?"text-blue-600":""}
-`}
->
-
-{app.status}
-
-</span>
-
-</p>
-
-</div>
-
-))}
-
-</div>
-
-</div>
-
-)
+  );
 
 }

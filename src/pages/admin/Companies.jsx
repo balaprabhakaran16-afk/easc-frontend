@@ -11,10 +11,16 @@ role:"",
 eligibleDepartment:""
 })
 
+/* ✅ FIX ONLY HERE */
+const baseURL =
+window.location.hostname === "localhost"
+? "http://localhost:5000"
+: "https://eascbackend.onrender.com"
+
 const fetchCompanies = ()=>{
 
 axios
-.get("http://localhost:5000/api/companies")
+.get(`${baseURL}/api/companies`)
 .then(res=>setCompanies(res.data || []))
 .catch(err=>console.log(err))
 
@@ -32,7 +38,7 @@ const addCompany = async ()=>{
 
 if(!form.companyName || !form.role) return
 
-await axios.post("http://localhost:5000/api/companies",form)
+await axios.post(`${baseURL}/api/companies`,form)
 
 setForm({
 companyName:"",
@@ -48,7 +54,7 @@ const deleteCompany = async (id)=>{
 
 if(!window.confirm("Delete this company?")) return
 
-await axios.delete(`http://localhost:5000/api/companies/${id}`)
+await axios.delete(`${baseURL}/api/companies/${id}`)
 
 fetchCompanies()
 

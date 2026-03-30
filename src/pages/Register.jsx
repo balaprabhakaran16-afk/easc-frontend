@@ -7,6 +7,8 @@ export default function Register() {
 
 const navigate = useNavigate();
 
+const [loading,setLoading] = useState(false)
+
 const [form, setForm] = useState({
 name: "",
 email: "",
@@ -24,7 +26,26 @@ const register = async (e) => {
 
 e.preventDefault();
 
+/* ✅ FRONTEND VALIDATION */
+
+if(!form.name || !form.email || !form.password){
+alert("All fields required");
+return;
+}
+
+if(form.role === "student" && !form.rollNo){
+alert("Roll Number required");
+return;
+}
+
+if((form.role === "student" || form.role === "staff") && !form.department){
+alert("Department required");
+return;
+}
+
 try {
+
+setLoading(true)
 
 await API.post("/auth/register", form);
 
@@ -34,9 +55,16 @@ navigate("/login");
 
 } catch (err) {
 
-alert("Registration Failed");
 console.log(err);
 
+/* ✅ BACKEND ERROR SHOW */
+
+alert(
+err?.response?.data?.message || "Registration Failed"
+);
+
+} finally {
+setLoading(false)
 }
 
 };
@@ -132,8 +160,13 @@ onChange={handleChange}
 className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 mb-6 rounded-lg outline-none focus:ring-2 focus:ring-[var(--primary)]"
 />
 
-<button className="w-full bg-[var(--primary)] hover:opacity-90 text-white py-3 rounded-lg font-semibold transition transform hover:scale-105">
-Create Account
+<button
+disabled={loading}
+className="w-full bg-[var(--primary)] hover:opacity-90 text-white py-3 rounded-lg font-semibold transition transform hover:scale-105 disabled:opacity-50"
+>
+
+{loading ? "Creating Account..." : "Create Account"}
+
 </button>
 
 <p className="text-center mt-6 text-sm">

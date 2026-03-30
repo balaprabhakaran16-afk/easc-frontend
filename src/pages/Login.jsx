@@ -7,6 +7,8 @@ export default function Login() {
 
 const navigate = useNavigate();
 
+const [loading,setLoading] = useState(false)
+
 const [form, setForm] = useState({
 email: "",
 password: ""
@@ -20,11 +22,20 @@ const login = async (e) => {
 
 e.preventDefault();
 
+/* ✅ VALIDATION */
+
+if(!form.email || !form.password){
+alert("Enter email and password");
+return;
+}
+
 try {
+
+setLoading(true)
 
 const res = await API.post("/auth/login", form);
 
-alert("Login Successful ✅");
+/* ✅ STORE DATA */
 
 localStorage.setItem("token", res.data.token);
 localStorage.setItem("role", res.data.role);
@@ -33,21 +44,28 @@ if (res.data.studentId) {
 localStorage.setItem("studentId", res.data.studentId);
 }
 
-const ok = window.confirm("Login Successful. Go to dashboard?");
+/* ✅ SET TOKEN HEADER (VERY IMPORTANT) */
 
-if (ok) {
+API.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
+
+alert("Login Successful ✅");
+
+/* ✅ DIRECT NAVIGATION (NO confirm) */
 
 if (res.data.role === "staff") navigate("/staff");
 else if (res.data.role === "student") navigate("/student");
 else if (res.data.role === "admin") navigate("/admin");
 
-}
-
 } catch (err) {
 
-alert("Invalid Email or Password ❌");
 console.log(err);
 
+alert(
+err?.response?.data?.message || "Invalid Email or Password ❌"
+);
+
+} finally {
+setLoading(false)
 }
 
 };
@@ -71,6 +89,7 @@ Login
 <input
 name="email"
 placeholder="Email"
+value={form.email}
 onChange={handleChange}
 className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 mb-4 rounded-lg outline-none focus:ring-2 focus:ring-[var(--primary)]"
 />
@@ -79,12 +98,18 @@ className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-g
 type="password"
 name="password"
 placeholder="Password"
+value={form.password}
 onChange={handleChange}
 className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 mb-6 rounded-lg outline-none focus:ring-2 focus:ring-[var(--primary)]"
 />
 
-<button className="w-full bg-[var(--primary)] hover:opacity-90 text-white py-3 rounded-lg font-semibold transition transform hover:scale-105">
-Login
+<button
+disabled={loading}
+className="w-full bg-[var(--primary)] hover:opacity-90 text-white py-3 rounded-lg font-semibold transition transform hover:scale-105 disabled:opacity-50"
+>
+
+{loading ? "Logging in..." : "Login"}
+
 </button>
 
 <p className="text-center mt-6 text-sm">

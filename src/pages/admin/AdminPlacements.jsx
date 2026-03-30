@@ -8,6 +8,12 @@ const [apps,setApps] = useState([])
 const [search,setSearch] = useState("")
 const [filter,setFilter] = useState("all")
 
+/* ✅ FIX ONLY HERE */
+const baseURL =
+window.location.hostname === "localhost"
+? "http://localhost:5000"
+: "https://eascbackend.onrender.com"
+
 useEffect(()=>{
 fetchApps()
 },[])
@@ -15,19 +21,26 @@ fetchApps()
 const fetchApps = ()=>{
 
 axios
-.get("http://localhost:5000/api/application/admin")
+.get(`${baseURL}/api/application/admin`)
 .then(res=>setApps(res.data))
+.catch(err=>console.error(err))
 
 }
 
 const updateStatus = async(id,status)=>{
 
+try{
+
 await axios.put(
-`http://localhost:5000/api/application/status/${id}`,
+`${baseURL}/api/application/status/${id}`,
 {status}
 )
 
 fetchApps()
+
+}catch(err){
+console.error(err)
+}
 
 }
 

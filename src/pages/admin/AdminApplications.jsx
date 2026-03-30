@@ -1,5 +1,5 @@
 import { useEffect,useState } from "react"
-import axios from "axios"
+import API from "../../api/axios"
 import { motion } from "framer-motion"
 
 export default function AdminApplications(){
@@ -19,8 +19,12 @@ fetchApplications()
 },[])
 
 const fetchApplications = async()=>{
-const res = await axios.get("http://localhost:5000/api/application/all")
+try{
+const res = await API.get("/application/all")
 setApplications(res.data)
+}catch(err){
+console.error(err)
+}
 }
 
 const handleChange = (e)=>{
@@ -28,18 +32,32 @@ setForm({...form,[e.target.name]:e.target.value})
 }
 
 const selectStudent = async(id)=>{
-await axios.put(`http://localhost:5000/api/application/select/${id}`,{
+try{
+await API.put(`/application/select/${id}`,{
 role:form.role,
 package:form.package,
 interviewDate:form.interviewDate
 })
 fetchApplications()
+}catch(err){
+console.error(err)
+}
 }
 
 const rejectStudent = async(id)=>{
-await axios.put(`http://localhost:5000/api/application/reject/${id}`)
+try{
+await API.put(`/application/reject/${id}`)
 fetchApplications()
+}catch(err){
+console.error(err)
 }
+}
+
+/* ✅ FIX ONLY HERE */
+const baseURL =
+window.location.hostname === "localhost"
+? "http://localhost:5000"
+: "https://eascbackend.onrender.com"
 
 const total = applications.length
 const selected = applications.filter(a=>a.status==="selected").length
@@ -185,7 +203,7 @@ className="hover:bg-gray-50 dark:hover:bg-gray-800"
 <td className="p-3 border">
 
 <a
-href={`http://localhost:5000/${app.resume}`}
+href={`${baseURL}/${app.resume}`} // ✅ FIXED ONLY
 target="_blank"
 className="text-blue-500 hover:underline"
 >

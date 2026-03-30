@@ -8,10 +8,16 @@ const [students,setStudents] = useState([])
 const [search,setSearch] = useState("")
 const [department,setDepartment] = useState("")
 
+/* ✅ FIX ONLY HERE */
+const baseURL =
+window.location.hostname === "localhost"
+? "http://localhost:5000"
+: "https://eascbackend.onrender.com"
+
 useEffect(()=>{
 
 axios
-.get("http://localhost:5000/api/students")
+.get(`${baseURL}/api/students`)
 .then(res=>{
 setStudents(res.data || [])
 })

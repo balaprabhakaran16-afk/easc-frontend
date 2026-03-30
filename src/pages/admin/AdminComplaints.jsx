@@ -12,9 +12,16 @@ useEffect(()=>{
 fetchComplaints()
 },[])
 
+/* ✅ FIX ONLY HERE */
+const baseURL =
+window.location.hostname === "localhost"
+? "http://localhost:5000"
+: "https://eascbackend.onrender.com"
+
 const fetchComplaints = ()=>{
-axios.get("http://localhost:5000/api/complaints")
+axios.get(`${baseURL}/api/complaints`)
 .then(res=>setComplaints(res.data))
+.catch(err=>console.error(err))
 }
 
 
@@ -29,12 +36,16 @@ setReplies({...replies,[id]:value})
 
 const replyComplaint = async(id)=>{
 
-await axios.put(`http://localhost:5000/api/complaints/reply/${id}`,{
+try{
+await axios.put(`${baseURL}/api/complaints/reply/${id}`,{
 reply:replies[id]
 })
 
 setReplies({...replies,[id]:""})
 fetchComplaints()
+}catch(err){
+console.error(err)
+}
 
 }
 
@@ -43,11 +54,15 @@ fetchComplaints()
 
 const resolveComplaint = async(id)=>{
 
-await axios.put(`http://localhost:5000/api/complaints/status/${id}`,{
+try{
+await axios.put(`${baseURL}/api/complaints/status/${id}`,{
 status:"resolved"
 })
 
 fetchComplaints()
+}catch(err){
+console.error(err)
+}
 
 }
 

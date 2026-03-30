@@ -9,10 +9,16 @@ const { id } = useParams()
 
 const [student,setStudent] = useState(null)
 
+/* ✅ FIX ONLY HERE */
+const baseURL =
+window.location.hostname === "localhost"
+? "http://localhost:5000"
+: "https://eascbackend.onrender.com"
+
 useEffect(()=>{
 
 axios
-.get(`http://localhost:5000/api/students/profile/${id}`)
+.get(`${baseURL}/api/students/profile/${id}`)
 .then(res=>{
 setStudent(res.data.student)
 })
